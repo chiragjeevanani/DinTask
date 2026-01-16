@@ -1,0 +1,93 @@
+import React from 'react';
+import { format } from 'date-fns';
+import { Clock, MessageSquare, Paperclip, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/shared/utils/cn';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+
+const TaskCardNew = ({ task, onClick }) => {
+    // Priority Badge Styles - matching user's HTML classes
+    const priorityConfig = {
+        low: { label: 'Low', color: 'bg-green-100 text-green-600' },
+        medium: { label: 'Medium', color: 'bg-orange-100 text-orange-600' },
+        high: { label: 'High Priority', color: 'bg-red-100 text-red-600' },
+        urgent: { label: 'Urgent', color: 'bg-red-100 text-red-600' }
+    };
+
+    const config = priorityConfig[task.priority] || priorityConfig.low;
+    const isCompleted = task.status === 'completed';
+
+    return (
+        <div
+            onClick={onClick}
+            className="group relative flex flex-col gap-3 rounded-xl bg-white dark:bg-slate-800 p-4 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+        >
+            <div className="flex justify-between items-start">
+                <div className="flex items-center gap-2">
+                    <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide", config.color)}>
+                        {config.label}
+                    </span>
+                </div>
+                <div className="flex size-6 items-center justify-center">
+                    <input
+                        type="checkbox"
+                        checked={isCompleted}
+                        readOnly
+                        className="size-5 rounded-full border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all"
+                    />
+                </div>
+            </div>
+
+            <div className={cn("flex flex-col gap-1", isCompleted && "opacity-60")}>
+                <p className={cn(
+                    "text-text-main dark:text-white text-base font-bold leading-tight",
+                    isCompleted && "line-through"
+                )}>
+                    {task.title}
+                </p>
+                <div className="flex items-center gap-1.5 text-text-secondary dark:text-gray-400">
+                    <Clock size={16} />
+                    <p className="text-xs font-medium">
+                        {isCompleted
+                            ? `Completed at ${format(new Date(), 'h:mm a')}`
+                            : `Due ${format(new Date(task.deadline), 'MMM dd, h:mm a')}`
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <div className={cn("flex items-center justify-between pt-2 mt-1 border-t border-slate-50 dark:border-slate-700", isCompleted ? "opacity-50" : "")}>
+                <div className="flex -space-x-2">
+                    {task.assignedTo && task.assignedTo.length > 0 ? (
+                        task.assignedTo.slice(0, 3).map((u, i) => (
+                            <Avatar key={i} className="h-7 w-7 border-2 border-white dark:border-slate-800">
+                                <AvatarFallback className="text-[9px] bg-slate-100 text-slate-500">U</AvatarFallback>
+                            </Avatar>
+                        ))
+                    ) : (
+                        <div className="size-7 rounded-full border-2 border-white dark:border-slate-800 bg-slate-100 flex items-center justify-center">
+                            <span className="text-[9px] font-bold text-gray-500">A</span>
+                        </div>
+                    )}
+                    {(task.assignedTo?.length || 0) > 3 && (
+                        <div className="flex size-7 items-center justify-center rounded-full border-2 border-white dark:border-slate-800 bg-slate-100 dark:bg-slate-700 text-[10px] font-bold text-gray-500">
+                            +{task.assignedTo.length - 3}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 text-text-secondary">
+                        <Paperclip size={18} />
+                        <span className="text-xs font-bold">1</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-primary">
+                        <MessageSquare size={18} />
+                        <span className="text-xs font-bold">2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TaskCardNew;

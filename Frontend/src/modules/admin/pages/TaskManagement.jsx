@@ -1,0 +1,391 @@
+import React, { useState } from 'react';
+import {
+    Plus,
+    Search,
+    Filter,
+    Calendar as CalendarIcon,
+    CheckCircle2,
+    Clock,
+    AlertCircle,
+    MoreVertical,
+    Flag,
+    User as UserIcon,
+    MessageSquare,
+    Trash2,
+    Edit2
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardFooter
+} from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Badge } from '@/shared/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/shared/components/ui/dialog";
+import { Label } from "@/shared/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/shared/components/ui/select";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+
+import useTaskStore from '@/store/taskStore';
+import useEmployeeStore from '@/store/employeeStore';
+import { cn } from '@/shared/utils/cn';
+import { fadeInUp, staggerContainer, scaleOnTap } from '@/shared/utils/animations';
+
+const TaskManagement = () => {
+    const { tasks, addTask, updateTask, deleteTask } = useTaskStore();
+    const { employees } = useEmployeeStore();
+
+    const [activeTab, setActiveTab] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const [newTask, setNewTask] = useState({
+        title: '',
+        description: '',
+        priority: 'medium',
+        deadline: '',
+        assignedTo: [],
+        collaborationEnabled: false
+    });
+
+    const priorityColors = {
+        low: "text-blue-600 bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30",
+        medium: "text-amber-600 bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30",
+        high: "text-orange-600 bg-orange-50 dark:bg-orange-900/10 border-orange-100 dark:border-orange-900/30",
+        urgent: "text-red-600 bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30"
+    };
+
+    const filteredTasks = tasks.filter(task => {
+        const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            task.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+        if (activeTab === 'all') return matchesSearch;
+        if (activeTab === 'pending') return matchesSearch && task.status === 'pending';
+        if (activeTab === 'completed') return matchesSearch && task.status === 'completed';
+        return matchesSearch;
+    });
+
+    const handleCreateTask = (e) => {
+        e.preventDefault();
+        if (!newTask.title || !newTask.deadline) {
+            toast.error('Please fill in required fields');
+            return;
+        }
+
+        addTask(newTask);
+        toast.success('Task created and assigned');
+        setIsCreateModalOpen(false);
+        setNewTask({
+            title: '',
+            description: '',
+            priority: 'medium',
+            deadline: '',
+            assignedTo: [],
+            collaborationEnabled: false
+        });
+    };
+
+    const toggleEmployeeAssignment = (empId) => {
+        setNewTask(prev => ({
+            ...prev,
+            assignedTo: prev.assignedTo.includes(empId)
+                ? prev.assignedTo.filter(id => id !== empId)
+                : [...prev.assignedTo, empId]
+        }));
+    };
+
+    return (
+        <motion.div
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
+            className="space-y-6"
+        >
+            <motion.div variants={fadeInUp} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white leading-tight">Task Management</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                        Create, assign, and track progress across your team.
+                    </p>
+                </div>
+
+                <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                    <DialogTrigger asChild>
+                        <motion.div {...scaleOnTap}>
+                            <Button className="flex items-center gap-2 shadow-lg shadow-primary-200 dark:shadow-none bg-primary-600 hover:bg-primary-700 h-11 px-6 rounded-xl">
+                                <Plus size={18} />
+                                <span className="font-bold">Create Task</span>
+                            </Button>
+                        </motion.div>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto rounded-3xl border-none">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-black">Create New Task</DialogTitle>
+                            <DialogDescription className="text-xs font-medium text-slate-500">
+                                Fill in the details below to assign a new task to your team.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateTask} className="grid gap-6 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-widest text-slate-400">Task Title</Label>
+                                <Input
+                                    id="title"
+                                    value={newTask.title}
+                                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                                    placeholder="e.g. Update Landing Page"
+                                    className="h-11 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800"
+                                    required
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-widest text-slate-400">Description</Label>
+                                <Textarea
+                                    id="description"
+                                    value={newTask.description}
+                                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                                    placeholder="Provide context and requirements..."
+                                    className="min-h-[100px] rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label className="text-xs font-bold uppercase tracking-widest text-slate-400">Priority</Label>
+                                    <Select
+                                        value={newTask.priority}
+                                        onValueChange={(val) => setNewTask({ ...newTask, priority: val })}
+                                    >
+                                        <SelectTrigger className="h-11 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800">
+                                            <SelectValue placeholder="Select priority" />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-xl">
+                                            <SelectItem value="low">Low</SelectItem>
+                                            <SelectItem value="medium">Medium</SelectItem>
+                                            <SelectItem value="high">High</SelectItem>
+                                            <SelectItem value="urgent">Urgent</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label className="text-xs font-bold uppercase tracking-widest text-slate-400">Deadline</Label>
+                                    <Input
+                                        type="date"
+                                        value={newTask.deadline}
+                                        onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
+                                        className="h-11 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid gap-3">
+                                <Label className="text-xs font-bold uppercase tracking-widest text-slate-400">Assign Employees</Label>
+                                <div className="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800">
+                                    {employees.map(emp => (
+                                        <div key={emp.id} className="flex items-center space-x-2 p-1">
+                                            <Checkbox
+                                                id={`emp-${emp.id}`}
+                                                checked={newTask.assignedTo.includes(emp.id)}
+                                                onCheckedChange={() => toggleEmployeeAssignment(emp.id)}
+                                                className="rounded-md border-slate-300"
+                                            />
+                                            <Label htmlFor={`emp-${emp.id}`} className="text-xs flex items-center gap-2 cursor-pointer font-bold">
+                                                <Avatar className="h-6 w-6 border border-white dark:border-slate-800 shadow-sm">
+                                                    <AvatarImage src={emp.avatar} />
+                                                    <AvatarFallback className="bg-primary-50 text-primary-600 text-[10px]">{emp.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                                {emp.name}
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-3 bg-primary-50/50 dark:bg-primary-900/10 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-900/20">
+                                <Checkbox
+                                    id="collab"
+                                    checked={newTask.collaborationEnabled}
+                                    onCheckedChange={(val) => setNewTask({ ...newTask, collaborationEnabled: !!val })}
+                                />
+                                <Label htmlFor="collab" className="text-xs font-bold text-primary-700 dark:text-primary-400 cursor-pointer">
+                                    Enable collaboration between assigned members
+                                </Label>
+                            </div>
+                        </form>
+                        <DialogFooter className="gap-2 sm:gap-0">
+                            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)} className="rounded-xl h-11 px-6">Cancel</Button>
+                            <Button onClick={handleCreateTask} className="rounded-xl h-11 px-6 bg-primary-600 hover:bg-primary-700">Assign Task</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </motion.div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 p-2 ">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <div className="flex flex-col sm:flex-row items-center justify-between p-3 gap-4">
+                        <TabsList className="bg-slate-100 dark:bg-slate-800 h-11 rounded-2xl p-1 w-full sm:w-auto">
+                            <TabsTrigger value="all" className="rounded-xl px-6 font-bold text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">All Tasks</TabsTrigger>
+                            <TabsTrigger value="pending" className="rounded-xl px-6 font-bold text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">Pending</TabsTrigger>
+                            <TabsTrigger value="completed" className="rounded-xl px-6 font-bold text-xs data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:shadow-sm">Completed</TabsTrigger>
+                        </TabsList>
+
+                        <div className="relative w-full sm:w-72">
+                            <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                            <Input
+                                placeholder="Search tasks by title..."
+                                className="pl-10 h-11 bg-slate-50 border-none dark:bg-slate-800 rounded-2xl font-medium focus:ring-2 focus:ring-primary-500/10 transition-all text-xs"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <TabsContent value={activeTab} className="mt-4 px-3 outline-none focus:ring-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6 relative">
+                            <AnimatePresence mode="sync">
+                                {filteredTasks.length === 0 ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="col-span-full h-64 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[2.5rem]"
+                                    >
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-full mb-4">
+                                            <AlertCircle size={48} className="opacity-20 text-slate-900 dark:text-white" />
+                                        </div>
+                                        <h3 className="font-black text-slate-900 dark:text-white text-lg">No tasks found</h3>
+                                        <p className="text-xs font-medium">Try adjusting your search or filters.</p>
+                                    </motion.div>
+                                ) : (
+                                    filteredTasks.map((task) => (
+                                        <motion.div
+                                            key={task.id}
+                                            variants={fadeInUp}
+                                            layout
+                                        >
+                                            <Card className="border-none shadow-md hover:shadow-xl transition-shadow duration-300 group overflow-hidden bg-white dark:bg-slate-900 flex flex-col rounded-3xl h-full border border-slate-50 dark:border-slate-800/50">
+                                                <div className={cn("h-1.5 w-full",
+                                                    task.priority === 'urgent' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]' :
+                                                        task.priority === 'high' ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]' :
+                                                            'bg-primary-500 shadow-[0_0_10px_rgba(59,130,246,0.4)]'
+                                                )} />
+                                                <CardHeader className="pb-3 pt-6 px-6">
+                                                    <div className="flex justify-between items-start mb-3">
+                                                        <Badge variant="outline" className={cn("font-bold text-[9px] uppercase tracking-widest px-2.5 py-1 border-none", priorityColors[task.priority])}>
+                                                            {task.priority}
+                                                        </Badge>
+                                                        <Badge className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full",
+                                                            task.status === 'completed' ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                                        )}>
+                                                            {task.status}
+                                                        </Badge>
+                                                    </div>
+                                                    <CardTitle className="text-lg font-black line-clamp-1 group-hover:text-primary-600 transition-colors tracking-tight">
+                                                        {task.title}
+                                                    </CardTitle>
+                                                    <CardDescription className="line-clamp-2 text-xs font-medium leading-relaxed min-h-[34px] text-slate-500 dark:text-slate-400">
+                                                        {task.description}
+                                                    </CardDescription>
+                                                </CardHeader>
+                                                <CardContent className="pb-4 px-6 flex-grow">
+                                                    <div className="flex flex-col gap-4">
+                                                        <div className="flex items-center gap-2 py-1 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl w-fit">
+                                                            <CalendarIcon size={12} className="text-primary-500" />
+                                                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                                                                {format(new Date(task.deadline), 'MMM dd, yyyy')}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex flex-col gap-2">
+                                                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Assigned Team</span>
+                                                            <div className="flex -space-x-3 overflow-hidden p-1">
+                                                                {task.assignedTo?.map(empId => {
+                                                                    const emp = employees.find(e => e.id === empId);
+                                                                    return (
+                                                                        <Avatar key={empId} className="h-9 w-9 border-4 border-white dark:border-slate-900 shadow-sm">
+                                                                            <AvatarImage src={emp?.avatar} />
+                                                                            <AvatarFallback className="text-[10px] font-black">{emp?.name.charAt(0)}</AvatarFallback>
+                                                                        </Avatar>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                                <CardFooter className="pt-4 px-6 pb-6 border-t border-slate-50 dark:border-slate-800 flex justify-between gap-3 bg-slate-50/30 dark:bg-slate-900/50">
+                                                    <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest h-9 px-4 rounded-xl hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm">
+                                                        <MessageSquare size={13} className="mr-2 text-primary-500" />
+                                                        Discussions
+                                                    </Button>
+                                                    <div className="flex gap-2">
+                                                        {task.status !== 'completed' && (
+                                                            <motion.div {...scaleOnTap}>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-9 w-9 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 rounded-xl border border-emerald-100/50 dark:border-emerald-900/20"
+                                                                    onClick={() => updateTask(task.id, { status: 'completed', completedAt: new Date().toISOString() })}
+                                                                >
+                                                                    <CheckCircle2 size={18} />
+                                                                </Button>
+                                                            </motion.div>
+                                                        )}
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:bg-white dark:hover:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                                                                    <MoreVertical size={18} />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="rounded-xl">
+                                                                <DropdownMenuItem className="text-xs font-bold gap-2 rounded-lg">
+                                                                    <Edit2 size={14} /> Edit Task
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem className="text-xs font-bold gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10 rounded-lg" onClick={() => deleteTask(task.id)}>
+                                                                    <Trash2 size={14} /> Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                </CardFooter>
+                                            </Card>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </div>
+        </motion.div>
+    );
+};
+
+export default TaskManagement;

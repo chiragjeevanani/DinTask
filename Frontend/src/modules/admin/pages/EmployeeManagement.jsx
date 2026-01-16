@@ -1,0 +1,399 @@
+import React, { useState, useMemo } from 'react';
+import {
+    Plus,
+    Search,
+    MoreVertical,
+    Edit2,
+    Trash2,
+    Mail,
+    Phone,
+    Shield,
+    CheckCircle2,
+    XCircle,
+    Filter,
+    ArrowUpDown,
+    Download,
+    Users,
+    ChevronDown,
+    ChevronUp,
+    Check
+} from 'lucide-react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Badge } from '@/shared/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogDescription
+} from '@/shared/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import useEmployeeStore from '@/store/employeeStore';
+import useTaskStore from '@/store/taskStore';
+import { cn } from '@/shared/utils/cn';
+import { Progress } from '@/shared/components/ui/progress';
+
+const EmployeeManagement = () => {
+    const { employees, deleteEmployee, addEmployee, updateEmployee } = useEmployeeStore();
+    const { tasks } = useTaskStore();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [expandedEmployee, setExpandedEmployee] = useState(null);
+    const [newEmployee, setNewEmployee] = useState({ name: '', email: '', role: '' });
+    const [parent] = useAutoAnimate();
+
+    // Mock limit for free/pro plan
+    const EMPLOYEE_LIMIT = 15;
+    const currentCount = employees.length;
+    const isLimitReached = currentCount >= EMPLOYEE_LIMIT;
+
+    const employeeStats = useMemo(() => {
+        const stats = {};
+        employees.forEach(emp => {
+            const empTasks = tasks.filter(t => t.assignedTo.includes(emp.id.toString()));
+            const completed = empTasks.filter(t => t.status === 'completed').length;
+            stats[emp.id] = {
+                total: empTasks.length,
+                completed: completed,
+                percentage: empTasks.length > 0 ? (completed / empTasks.length) * 100 : 0,
+                tasks: empTasks
+            };
+        });
+        return stats;
+    }, [employees, tasks]);
+
+    const filteredEmployees = useMemo(() => {
+        return employees.filter(emp => {
+            const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                emp.email.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesStatus = filterStatus === 'all' || emp.status === filterStatus;
+            return matchesSearch && matchesStatus;
+        });
+    }, [employees, searchTerm, filterStatus]);
+
+    const handleAddEmployee = (e) => {
+        e.preventDefault();
+        if (isLimitReached) return;
+        addEmployee({
+            ...newEmployee,
+            id: Date.now(),
+            status: 'active',
+            joinedDate: new Date().toLocaleDateString()
+        });
+        setNewEmployee({ name: '', email: '', role: '' });
+        setIsAddModalOpen(false);
+    };
+
+    const handleDelete = (id) => {
+        if (window.confirm('Are you sure you want to remove this employee?')) {
+            deleteEmployee(id);
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Employee Management</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your team members and their access levels.</p>
+                </div>
+                <div className="flex gap-2">
+                    <Button variant="outline" className="gap-2 border-slate-200 dark:border-slate-800">
+                        <Download size={18} />
+                        <span>Export CSV</span>
+                    </Button>
+                    <Button
+                        onClick={() => setIsAddModalOpen(true)}
+                        disabled={isLimitReached}
+                        className="gap-2 shadow-lg shadow-primary-200 dark:shadow-none bg-primary-600 hover:bg-primary-700"
+                    >
+                        <Plus size={18} />
+                        <span>Add New Employee</span>
+                    </Button>
+                </div>
+            </div>
+
+            {/* Subscription Alert */}
+            <Alert className="bg-blue-50/50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-900/30 rounded-2xl">
+                <Shield className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-700 dark:text-blue-400 font-medium">
+                    You have used <span className="font-bold">{currentCount}</span> of <span className="font-bold">{EMPLOYEE_LIMIT}</span> employee slots.
+                    {isLimitReached && <span className="ml-2 text-red-500">Limit reached! Upgrade for more.</span>}
+                </AlertDescription>
+            </Alert>
+
+            {/* Toolbar */}
+            <Card className="border-none shadow-sm bg-white dark:bg-slate-900 rounded-3xl">
+                <CardContent className="p-4 flex flex-col md:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                        <Input
+                            placeholder="Search by name or email..."
+                            className="pl-9 h-11 border-slate-100 dark:border-slate-800 rounded-xl"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant={filterStatus === 'all' ? 'default' : 'outline'}
+                            onClick={() => setFilterStatus('all')}
+                            className="rounded-xl px-4 h-11"
+                        >
+                            All
+                        </Button>
+                        <Button
+                            variant={filterStatus === 'active' ? 'default' : 'outline'}
+                            onClick={() => setFilterStatus('active')}
+                            className="rounded-xl px-4 h-11"
+                        >
+                            Active
+                        </Button>
+                        <Button
+                            variant={filterStatus === 'inactive' ? 'default' : 'outline'}
+                            onClick={() => setFilterStatus('inactive')}
+                            className="rounded-xl px-4 h-11"
+                        >
+                            Inactive
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Employee Table */}
+            <Card className="border-none shadow-lg shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-slate-50 dark:border-slate-800">
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest w-10"></th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Employee</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Role</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Task Progress</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody ref={parent}>
+                            {filteredEmployees.map((emp) => {
+                                const stats = employeeStats[emp.id] || { total: 0, completed: 0, percentage: 0, tasks: [] };
+                                const isExpanded = expandedEmployee === emp.id;
+
+                                return (
+                                    <React.Fragment key={emp.id}>
+                                        <tr className={cn(
+                                            "border-b border-slate-50 dark:border-slate-800 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer",
+                                            isExpanded && "bg-slate-50/80 dark:bg-slate-800/80"
+                                        )} onClick={() => setExpandedEmployee(isExpanded ? null : emp.id)}>
+                                            <td className="p-5">
+                                                {isExpanded ? <ChevronUp size={16} className="text-primary-600" /> : <ChevronDown size={16} className="text-slate-400" />}
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar className="h-10 w-10 border-2 border-white dark:border-slate-800 shadow-sm">
+                                                        <AvatarImage src={emp.avatar} />
+                                                        <AvatarFallback className="bg-primary-50 text-primary-600 font-bold">{emp.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="font-bold text-slate-900 dark:text-white leading-none">{emp.name}</p>
+                                                        <p className="text-xs text-slate-500 mt-1">{emp.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-5">
+                                                <Badge variant="outline" className="rounded-lg font-bold text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-600 tracking-wider">
+                                                    {emp.role}
+                                                </Badge>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex flex-col gap-1.5 w-40">
+                                                    <div className="flex justify-between items-center text-[10px] font-bold">
+                                                        <span className="text-slate-500 uppercase">Success Rate</span>
+                                                        <span className="text-primary-600">{stats.completed}/{stats.total}</span>
+                                                    </div>
+                                                    <Progress value={stats.percentage} className="h-1.5 bg-slate-100 dark:bg-slate-800" indicatorClassName="bg-primary-600" />
+                                                </div>
+                                            </td>
+                                            <td className="p-5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn(
+                                                        "h-1.5 w-1.5 rounded-full",
+                                                        emp.status === 'active' ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-300"
+                                                    )} />
+                                                    <span className={cn(
+                                                        "text-xs font-bold uppercase tracking-widest",
+                                                        emp.status === 'active' ? "text-emerald-600" : "text-slate-400"
+                                                    )}>
+                                                        {emp.status}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="p-5 text-right">
+                                                <div className="flex justify-end gap-1 opacity-10 lg:opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg">
+                                                        <Edit2 size={14} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                                        onClick={() => handleDelete(emp.id)}
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 rounded-lg">
+                                                                <MoreVertical size={14} />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="rounded-xl">
+                                                            <DropdownMenuItem className="gap-2 text-xs font-medium rounded-lg">
+                                                                <Mail size={14} /> Send Email
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem className="gap-2 text-xs font-medium rounded-lg">
+                                                                <Phone size={14} /> Call Member
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {isExpanded && (
+                                            <tr className="bg-slate-50/30 dark:bg-slate-800/20">
+                                                <td colSpan={6} className="p-0">
+                                                    <div className="px-16 py-6 animate-in slide-in-from-top-2 duration-300">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                                                Tasks Todo List
+                                                                <Badge className="bg-primary-50 text-primary-700 hover:bg-primary-50 border-none px-2 py-0.5 text-[9px]">{stats.total} Assigned</Badge>
+                                                            </h4>
+                                                        </div>
+                                                        <div className="grid gap-2">
+                                                            {stats.tasks.length > 0 ? (
+                                                                stats.tasks.map(task => (
+                                                                    <div key={task.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm group/task">
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className={cn(
+                                                                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all",
+                                                                                task.status === 'completed'
+                                                                                    ? "bg-emerald-500 border-emerald-500 text-white"
+                                                                                    : "border-slate-200 dark:border-slate-700 bg-transparent"
+                                                                            )}>
+                                                                                {task.status === 'completed' && <Check size={12} strokeWidth={4} />}
+                                                                            </div>
+                                                                            <span className={cn(
+                                                                                "text-sm font-bold",
+                                                                                task.status === 'completed' ? "text-slate-400 line-through decoration-slate-300" : "text-slate-700 dark:text-slate-200"
+                                                                            )}>
+                                                                                {task.title}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Badge variant="outline" className={cn(
+                                                                                "text-[9px] font-black uppercase tracking-tighter px-2 py-0",
+                                                                                task.priority === 'urgent' ? "text-red-500 border-red-100 bg-red-50/50" :
+                                                                                    task.priority === 'high' ? "text-orange-500 border-orange-100 bg-orange-50/50" :
+                                                                                        "text-blue-500 border-blue-100 bg-blue-50/50"
+                                                                            )}>
+                                                                                {task.priority}
+                                                                            </Badge>
+                                                                            <span className="text-[10px] font-bold text-slate-400 tabular-nums">
+                                                                                {task.progress}%
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="py-8 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
+                                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No tasks assigned yet</p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+
+                {filteredEmployees.length === 0 && (
+                    <div className="p-20 text-center">
+                        <Users className="mx-auto h-12 w-12 text-slate-200 dark:text-slate-800 mb-4" />
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No employees found</h3>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Try adjusting your search or filters.</p>
+                    </div>
+                )}
+            </Card>
+
+            {/* Add Employee Dialog */}
+            <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl duration-200">
+                    <DialogHeader>
+                        <DialogTitle>Add New Employee</DialogTitle>
+                        <DialogDescription>Enter employee details to give them access to the platform.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleAddEmployee} className="space-y-4 py-4">
+                        <div className="grid gap-2">
+                            <label htmlFor="name" className="text-xs font-bold text-slate-500 uppercase">Full Name</label>
+                            <Input
+                                id="name"
+                                value={newEmployee.name}
+                                onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                                placeholder="John Doe"
+                                className="rounded-xl h-11"
+                                required
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <label htmlFor="email" className="text-xs font-bold text-slate-500 uppercase">Email Address</label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={newEmployee.email}
+                                onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                                placeholder="john@example.com"
+                                className="rounded-xl h-11"
+                                required
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <label htmlFor="role" className="text-xs font-bold text-slate-500 uppercase">Role</label>
+                            <Input
+                                id="role"
+                                value={newEmployee.role}
+                                onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+                                placeholder="Software Engineer"
+                                className="rounded-xl h-11"
+                                required
+                            />
+                        </div>
+                        <DialogFooter className="pt-4">
+                            <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)} className="rounded-xl h-11 px-6">Cancel</Button>
+                            <Button type="submit" className="rounded-xl h-11 px-6 bg-primary-600 hover:bg-primary-700">Add Employee</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+};
+
+export default EmployeeManagement;

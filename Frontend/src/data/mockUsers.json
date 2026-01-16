@@ -1,0 +1,20 @@
+{
+    "superadmin": {
+        "email": "superadmin@dintask.com",
+        "password": "super123",
+        "role": "superadmin",
+        "name": "Super Admin"
+    },
+    "admin": {
+        "email": "admin@dintask.com",
+        "password": "admin123",
+        "role": "admin",
+        "name": "Boss Admin"
+    },
+    "employee": {
+        "email": "employee@dintask.com",
+        "password": "emp123",
+        "role": "employee",
+        "name": "John Doe"
+    }
+}

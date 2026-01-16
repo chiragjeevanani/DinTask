@@ -1,0 +1,166 @@
+[
+    {
+        "id": "1",
+        "title": "Quarterly Client Review - Acme Corp",
+        "description": "Prepare the comprehensive quarterly business review for Acme Corp. Focus on the Q3 retention metrics and the expansion of the 'Enterprise Cloud' tier. We need to address the recent support latency concerns raised by their CTO.",
+        "deadline": "2026-01-18T14:30:00",
+        "priority": "urgent",
+        "status": "pending",
+        "assignedTo": [
+            "101",
+            "102",
+            "103"
+        ],
+        "createdAt": "2026-01-14T09:00:00",
+        "progress": 65,
+        "labels": [
+            "Strategy",
+            "Client"
+        ],
+        "activity": [
+            {
+                "type": "comment",
+                "user": "Sarah L.",
+                "avatar": "https://i.pravatar.cc/150?u=sarah",
+                "content": "I've uploaded the latest report. Please review the financial projection section on page 4.",
+                "time": "2 hours ago"
+            },
+            {
+                "type": "system",
+                "user": "John D.",
+                "content": "changed status to In Progress",
+                "time": "Yesterday at 4:15 PM"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "title": "Update Employee Handbook",
+        "description": "Revise the remote work policy section to reflect the new hybrid model guidelines effectively immediately.",
+        "deadline": "2026-01-20T10:00:00",
+        "priority": "medium",
+        "status": "pending",
+        "assignedTo": [
+            "104"
+        ],
+        "createdAt": "2026-01-15T10:30:00",
+        "progress": 20,
+        "labels": [
+            "HR",
+            "Internal"
+        ],
+        "activity": []
+    },
+    {
+        "id": "3",
+        "title": "Fix Navigation Bug on Mobile",
+        "description": "The sidebar menu is not collapsing correctly on iOS Safari when in landscape mode.",
+        "deadline": "2026-01-16T18:00:00",
+        "priority": "high",
+        "status": "pending",
+        "assignedTo": [
+            "101",
+            "105"
+        ],
+        "createdAt": "2026-01-16T08:15:00",
+        "progress": 40,
+        "labels": [
+            "Bug",
+            "Engineering"
+        ],
+        "activity": []
+    },
+    {
+        "id": "4",
+        "title": "Prepare Marketing Assets for Q1 Launch",
+        "description": "Design social media banners and email templates for the new product launch.",
+        "deadline": "2026-01-25T17:00:00",
+        "priority": "low",
+        "status": "pending",
+        "assignedTo": [
+            "102"
+        ],
+        "createdAt": "2026-01-10T14:00:00",
+        "progress": 10,
+        "labels": [
+            "Marketing",
+            "Design"
+        ],
+        "activity": []
+    },
+    {
+        "id": "5",
+        "title": "Server Maintenance & Security Patch",
+        "description": "Apply the critical security patch to the production database and restart services.",
+        "deadline": "2026-01-16T11:00:00",
+        "priority": "urgent",
+        "status": "completed",
+        "completedAt": "2026-01-16T10:45:00",
+        "assignedTo": [
+            "105",
+            "103"
+        ],
+        "createdAt": "2026-01-12T09:00:00",
+        "progress": 100,
+        "labels": [
+            "DevOps",
+            "Security"
+        ],
+        "activity": []
+    },
+    {
+        "id": "6",
+        "title": "Conduct User Interviews - Batch 2",
+        "description": "Interview 5 beta users to gather feedback on the new potential feature set.",
+        "deadline": "2026-01-22T15:00:00",
+        "priority": "medium",
+        "status": "pending",
+        "assignedTo": [
+            "101",
+            "104"
+        ],
+        "createdAt": "2026-01-13T11:20:00",
+        "progress": 0,
+        "labels": [
+            "Product",
+            "Research"
+        ],
+        "activity": []
+    },
+    {
+        "id": "7",
+        "title": "Finalize Q3 Budget Proposal",
+        "description": "Review department expenses and propose budget allocation for Q3.",
+        "deadline": "2026-01-19T16:00:00",
+        "priority": "high",
+        "status": "completed",
+        "completedAt": "2026-01-15T15:30:00",
+        "assignedTo": [
+            "101"
+        ],
+        "createdAt": "2026-01-11T10:00:00",
+        "progress": 100,
+        "labels": [
+            "Finance"
+        ],
+        "activity": []
+    },
+    {
+        "id": "8",
+        "title": "Create Onboarding Documentation",
+        "description": "Write documentation for new hires joining the engineering team.",
+        "deadline": "2026-01-24T12:00:00",
+        "priority": "low",
+        "status": "pending",
+        "assignedTo": [
+            "105"
+        ],
+        "createdAt": "2026-01-14T13:00:00",
+        "progress": 5,
+        "labels": [
+            "HR",
+            "Engineering"
+        ],
+        "activity": []
+    }
+]

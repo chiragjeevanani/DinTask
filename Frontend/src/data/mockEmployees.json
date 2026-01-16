@@ -1,0 +1,42 @@
+[
+    {
+        "id": "101",
+        "name": "Alex Morgan",
+        "role": "Product Manager",
+        "email": "alex.m@company.com",
+        "avatar": "https://i.pravatar.cc/150?u=alex",
+        "status": "active"
+    },
+    {
+        "id": "102",
+        "name": "Sarah Lee",
+        "role": "Lead Designer",
+        "email": "sarah.l@company.com",
+        "avatar": "https://i.pravatar.cc/150?u=sarah",
+        "status": "active"
+    },
+    {
+        "id": "103",
+        "name": "John Doe",
+        "role": "Software Engineer",
+        "email": "john.d@company.com",
+        "avatar": "https://i.pravatar.cc/150?u=john",
+        "status": "active"
+    },
+    {
+        "id": "104",
+        "name": "Emily Chen",
+        "role": "HR Specialist",
+        "email": "emily.c@company.com",
+        "avatar": "https://i.pravatar.cc/150?u=emily",
+        "status": "away"
+    },
+    {
+        "id": "105",
+        "name": "Mike Ross",
+        "role": "DevOps Engineer",
+        "email": "mike.r@company.com",
+        "avatar": "https://i.pravatar.cc/150?u=mike",
+        "status": "active"
+    }
+]

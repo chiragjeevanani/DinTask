@@ -44,6 +44,7 @@ import {
 
 import useTaskStore from '@/store/taskStore';
 import useEmployeeStore from '@/store/employeeStore';
+import useManagerStore from '@/store/managerStore';
 import { cn } from '@/shared/utils/cn';
 
 const Reports = () => {
@@ -52,13 +53,16 @@ const Reports = () => {
 
     const [dateRange, setDateRange] = useState('7'); // days
     const [selectedEmployee, setSelectedEmployee] = useState('all');
+    const [selectedManager, setSelectedManager] = useState('all');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [reportType, setReportType] = useState('overview'); // overview, employees, managers
 
     const filteredData = useMemo(() => {
         return tasks.filter(task => {
             const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesEmployee = selectedEmployee === 'all' || task.assignedTo.includes(selectedEmployee);
+            const matchesManager = selectedManager === 'all' || task.assignedToManager === selectedManager;
             const matchesStatus = selectedStatus === 'all' || task.status === selectedStatus;
 
             // Date filter mock (just filtering latest tasks based on dateRange)
@@ -67,9 +71,9 @@ const Reports = () => {
             const diffDays = Math.ceil((now - taskDate) / (1000 * 60 * 60 * 24));
             const matchesDate = diffDays <= parseInt(dateRange);
 
-            return matchesSearch && matchesEmployee && matchesStatus && matchesDate;
+            return matchesSearch && matchesEmployee && matchesManager && matchesStatus && matchesDate;
         });
-    }, [tasks, searchTerm, selectedEmployee, selectedStatus, dateRange]);
+    }, [tasks, searchTerm, selectedEmployee, selectedManager, selectedStatus, dateRange]);
 
     const reportStats = useMemo(() => {
         return {
@@ -101,6 +105,31 @@ const Reports = () => {
                         <span>Export CSV</span>
                     </Button>
                 </div>
+            </div>
+
+            {/* Report Type Selector */}
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl w-fit">
+                <Button
+                    variant={reportType === 'overview' ? 'default' : 'ghost'}
+                    onClick={() => setReportType('overview')}
+                    className={cn("rounded-xl h-9 px-6 text-xs font-bold transition-all", reportType === 'overview' ? "bg-white dark:bg-slate-700 shadow-sm" : "text-slate-500")}
+                >
+                    Overview
+                </Button>
+                <Button
+                    variant={reportType === 'employees' ? 'default' : 'ghost'}
+                    onClick={() => setReportType('employees')}
+                    className={cn("rounded-xl h-9 px-6 text-xs font-bold transition-all", reportType === 'employees' ? "bg-white dark:bg-slate-700 shadow-sm" : "text-slate-500")}
+                >
+                    Employees
+                </Button>
+                <Button
+                    variant={reportType === 'managers' ? 'default' : 'ghost'}
+                    onClick={() => setReportType('managers')}
+                    className={cn("rounded-xl h-9 px-6 text-xs font-bold transition-all", reportType === 'managers' ? "bg-white dark:bg-slate-700 shadow-sm" : "text-slate-500")}
+                >
+                    Managers
+                </Button>
             </div>
 
             {/* Filters Bar */}

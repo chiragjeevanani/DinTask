@@ -17,11 +17,20 @@ const useAuthStore = create(
                 // Simulate API delay
                 await new Promise((resolve) => setTimeout(resolve, 800));
 
-                const user = mockUsers[selectedRole];
+                let user;
+                let userData;
+
+                if (selectedRole === 'manager') {
+                    // Import manager data dynamically or use from a store if available
+                    // For now, checking mockUsers.json which I updated to include 'manager'
+                    user = mockUsers[selectedRole];
+                } else {
+                    user = mockUsers[selectedRole];
+                }
 
                 if (user && user.email === email && user.password === password) {
-                    const userData = {
-                        id: selectedRole === 'employee' ? '1' : selectedRole,
+                    userData = {
+                        id: selectedRole === 'employee' ? '103' : (selectedRole === 'manager' ? 'M001' : selectedRole),
                         name: user.name,
                         email: user.email,
                     };

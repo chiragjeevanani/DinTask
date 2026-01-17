@@ -48,6 +48,18 @@ const useEmployeeStore = create(
                     employees: state.employees.filter((emp) => emp.id !== id),
                 }));
             },
+
+            getEmployeesByManager: (managerId) => {
+                return get().employees.filter(emp => emp.managerId === managerId);
+            },
+
+            assignManagerToEmployee: (employeeId, managerId) => {
+                set((state) => ({
+                    employees: state.employees.map((emp) =>
+                        emp.id === employeeId ? { ...emp, managerId } : emp
+                    ),
+                }));
+            },
         }),
         {
             name: 'dintask-employees-storage',

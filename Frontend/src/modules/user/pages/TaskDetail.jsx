@@ -12,7 +12,10 @@ import {
     AlertTriangle,
     Flag,
     MoreVertical,
-    Activity
+    Activity,
+    Shield,
+    ChevronRight,
+    User
 } from 'lucide-react';
 import { format, isAfter } from 'date-fns';
 import { toast } from 'sonner';
@@ -43,6 +46,7 @@ import {
 import useTaskStore from '@/store/taskStore';
 import useEmployeeStore from '@/store/employeeStore';
 import useAuthStore from '@/store/authStore';
+import useManagerStore from '@/store/managerStore';
 import { cn } from '@/shared/utils/cn';
 
 const TaskDetail = () => {
@@ -50,6 +54,7 @@ const TaskDetail = () => {
     const navigate = useNavigate();
     const { tasks, updateTask, addActivity } = useTaskStore();
     const { employees } = useEmployeeStore();
+    const { managers } = useManagerStore();
     const { user: currentUser } = useAuthStore();
 
     const [comment, setComment] = useState('');
@@ -139,6 +144,48 @@ const TaskDetail = () => {
                     <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-text-main dark:text-white">
                         {task.title}
                     </h1>
+                </div>
+
+                {/* Task Hierarchy Visualization */}
+                <div className="mb-8 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Assignment Path</h4>
+                    <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center gap-1">
+                            <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
+                                <Shield size={18} />
+                            </div>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Admin</span>
+                        </div>
+                        <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700 relative">
+                            <div className="absolute inset-x-0 -top-1 flex items-center justify-center">
+                                <ChevronRight size={10} className="text-slate-300" />
+                            </div>
+                        </div>
+                        {task.delegatedBy && (
+                            <>
+                                <div className="flex flex-col items-center gap-1">
+                                    <Avatar className="h-10 w-10 border-2 border-primary-100">
+                                        <AvatarImage src={managers.find(m => m.id === task.delegatedBy)?.avatar} />
+                                        <AvatarFallback className="bg-primary-50 text-primary-600 font-bold">
+                                            {managers.find(m => m.id === task.delegatedBy)?.name.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-primary-600">Manager</span>
+                                </div>
+                                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700 relative">
+                                    <div className="absolute inset-x-0 -top-1 flex items-center justify-center">
+                                        <ChevronRight size={10} className="text-slate-300" />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        <div className="flex flex-col items-center gap-1">
+                            <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                                <User size={18} />
+                            </div>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">You</span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Quick Info Grid */}

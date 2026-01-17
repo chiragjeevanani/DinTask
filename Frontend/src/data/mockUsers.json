@@ -16,5 +16,11 @@
         "password": "emp123",
         "role": "employee",
         "name": "Chirag J"
+    },
+    "manager": {
+        "email": "manager@dintask.com",
+        "password": "manager123",
+        "role": "manager",
+        "name": "Sarah Manager"
     }
 }

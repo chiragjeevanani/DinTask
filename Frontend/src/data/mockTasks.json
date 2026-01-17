@@ -11,6 +11,9 @@
             "102",
             "103"
         ],
+        "assignedBy": "admin",
+        "assignedToManager": "M001",
+        "delegatedBy": "M001",
         "createdAt": "2026-01-14T09:00:00",
         "progress": 65,
         "labels": [
@@ -43,6 +46,9 @@
         "assignedTo": [
             "104"
         ],
+        "assignedBy": "admin",
+        "assignedToManager": "M002",
+        "delegatedBy": "M002",
         "createdAt": "2026-01-15T10:30:00",
         "progress": 20,
         "labels": [
@@ -62,6 +68,9 @@
             "101",
             "105"
         ],
+        "assignedBy": "admin",
+        "assignedToManager": "M001",
+        "delegatedBy": "M001",
         "createdAt": "2026-01-16T08:15:00",
         "progress": 40,
         "labels": [

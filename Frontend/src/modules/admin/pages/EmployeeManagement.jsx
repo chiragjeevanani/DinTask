@@ -42,17 +42,19 @@ import {
 import { Alert, AlertDescription } from '@/shared/components/ui/alert';
 import useEmployeeStore from '@/store/employeeStore';
 import useTaskStore from '@/store/taskStore';
+import useManagerStore from '@/store/managerStore';
 import { cn } from '@/shared/utils/cn';
 import { Progress } from '@/shared/components/ui/progress';
 
 const EmployeeManagement = () => {
     const { employees, deleteEmployee, addEmployee, updateEmployee } = useEmployeeStore();
     const { tasks } = useTaskStore();
+    const { managers } = useManagerStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [expandedEmployee, setExpandedEmployee] = useState(null);
-    const [newEmployee, setNewEmployee] = useState({ name: '', email: '', role: '' });
+    const [newEmployee, setNewEmployee] = useState({ name: '', email: '', role: '', managerId: '' });
     const [parent] = useAutoAnimate();
 
     // Mock limit for free/pro plan
@@ -93,7 +95,7 @@ const EmployeeManagement = () => {
             status: 'active',
             joinedDate: new Date().toLocaleDateString()
         });
-        setNewEmployee({ name: '', email: '', role: '' });
+        setNewEmployee({ name: '', email: '', role: '', managerId: '' });
         setIsAddModalOpen(false);
     };
 
@@ -181,6 +183,7 @@ const EmployeeManagement = () => {
                             <tr className="border-b border-slate-50 dark:border-slate-800">
                                 <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest w-10"></th>
                                 <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[250px]">Employee</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[150px]">Reports To</th>
                                 <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[150px]">Role</th>
                                 <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[200px]">Task Progress</th>
                                 <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[120px]">Status</th>
@@ -212,6 +215,21 @@ const EmployeeManagement = () => {
                                                         <p className="text-xs text-slate-500 mt-1">{emp.email}</p>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td className="p-5">
+                                                {emp.managerId ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <Avatar className="h-6 w-6 border border-white dark:border-slate-800 shadow-sm">
+                                                            <AvatarImage src={managers.find(m => m.id === emp.managerId)?.avatar} />
+                                                            <AvatarFallback className="text-[8px] font-black">{managers.find(m => m.id === emp.managerId)?.name.charAt(0)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                            {managers.find(m => m.id === emp.managerId)?.name}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Unassigned</span>
+                                                )}
                                             </td>
                                             <td className="p-5">
                                                 <Badge variant="outline" className="rounded-lg font-bold text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-600 tracking-wider">
@@ -384,6 +402,20 @@ const EmployeeManagement = () => {
                                 className="rounded-xl h-11"
                                 required
                             />
+                        </div>
+                        <div className="grid gap-2">
+                            <label htmlFor="manager" className="text-xs font-bold text-slate-500 uppercase">Assign Manager</label>
+                            <select
+                                id="manager"
+                                className="w-full h-11 rounded-xl bg-slate-50 border-slate-200 px-3 text-sm focus:ring-2 focus:ring-primary-500/10 outline-none transition-all"
+                                value={newEmployee.managerId}
+                                onChange={(e) => setNewEmployee({ ...newEmployee, managerId: e.target.value })}
+                            >
+                                <option value="">No Manager (Unassigned)</option>
+                                {managers.map(mgr => (
+                                    <option key={mgr.id} value={mgr.id}>{mgr.name} ({mgr.department})</option>
+                                ))}
+                            </select>
                         </div>
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)} className="rounded-xl h-11 px-6">Cancel</Button>

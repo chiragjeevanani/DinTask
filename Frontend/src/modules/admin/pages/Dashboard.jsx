@@ -29,11 +29,15 @@ import { Badge } from '@/shared/components/ui/badge';
 import { Progress } from '@/shared/components/ui/progress';
 import useTaskStore from '@/store/taskStore';
 import useAuthStore from '@/store/authStore';
+import useManagerStore from '@/store/managerStore';
+import useEmployeeStore from '@/store/employeeStore';
 import { fadeInUp, staggerContainer, scaleOnTap } from '@/shared/utils/animations';
 
 const AdminDashboard = () => {
     const { user } = useAuthStore();
     const { tasks } = useTaskStore();
+    const { managers } = useManagerStore();
+    const { employees } = useEmployeeStore();
 
     // Mock data for the chart
     const chartData = [
@@ -66,20 +70,20 @@ const AdminDashboard = () => {
                 description: "85% completion rate"
             },
             {
-                title: "Pending Tasks",
-                value: tasks.filter(t => t.status === 'pending').length,
+                title: "Tasks Pending Mgr",
+                value: tasks.filter(t => t.assignedToManager && t.status === 'pending' && !t.delegatedBy).length,
                 icon: AlertCircle,
                 color: "text-amber-600",
                 bg: "bg-amber-50 dark:bg-amber-900/20",
-                description: "3 high priority"
+                description: "Awaiting delegation"
             },
             {
-                title: "Active Employees",
-                value: 12,
+                title: "Active Managers",
+                value: managers.length,
                 icon: Users,
                 color: "text-purple-600",
                 bg: "bg-purple-50 dark:bg-purple-900/20",
-                description: "2 on leave"
+                description: `${employees.length} employees reporting`
             }
         ];
     }, [tasks]);

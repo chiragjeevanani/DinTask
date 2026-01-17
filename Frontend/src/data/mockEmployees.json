@@ -5,7 +5,8 @@
         "role": "Product Manager",
         "email": "alex.m@company.com",
         "avatar": "https://i.pravatar.cc/150?u=alex",
-        "status": "active"
+        "status": "active",
+        "managerId": "M001"
     },
     {
         "id": "102",
@@ -13,7 +14,8 @@
         "role": "Lead Designer",
         "email": "sarah.l@company.com",
         "avatar": "https://i.pravatar.cc/150?u=sarah",
-        "status": "active"
+        "status": "active",
+        "managerId": "M001"
     },
     {
         "id": "103",
@@ -21,7 +23,8 @@
         "role": "Software Engineer",
         "email": "chirag.j@dintask.com",
         "avatar": "https://i.pravatar.cc/150?u=chirag",
-        "status": "active"
+        "status": "active",
+        "managerId": "M001"
     },
     {
         "id": "104",
@@ -29,7 +32,8 @@
         "role": "HR Specialist",
         "email": "emily.c@company.com",
         "avatar": "https://i.pravatar.cc/150?u=emily",
-        "status": "away"
+        "status": "away",
+        "managerId": "M002"
     },
     {
         "id": "105",
@@ -37,6 +41,7 @@
         "role": "DevOps Engineer",
         "email": "mike.r@company.com",
         "avatar": "https://i.pravatar.cc/150?u=mike",
-        "status": "active"
+        "status": "active",
+        "managerId": "M001"
     }
 ]

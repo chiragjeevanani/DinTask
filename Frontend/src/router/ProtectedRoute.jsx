@@ -15,6 +15,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
             loginPath = '/superadmin/login';
         } else if (allowedRoles && allowedRoles.includes('admin')) {
             loginPath = '/admin/login';
+        } else if (allowedRoles && allowedRoles.includes('manager')) {
+            loginPath = '/manager/login';
         }
 
         return <Navigate to={loginPath} state={{ from: location }} replace />;
@@ -26,7 +28,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
             ? '/superadmin'
             : role === 'admin'
                 ? '/admin'
-                : '/employee';
+                : role === 'manager'
+                    ? '/manager'
+                    : '/employee';
 
         return <Navigate to={defaultRoute} replace />;
     }

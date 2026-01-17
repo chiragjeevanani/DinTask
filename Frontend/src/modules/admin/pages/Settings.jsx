@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     User,
     Bell,
@@ -26,16 +26,25 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Switch } from "@/shared/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { Separator } from "@/shared/components/ui/separator";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import { useSearchParams } from 'react-router-dom';
 import useAuthStore from '@/store/authStore';
 
 const Settings = () => {
     const { user } = useAuthStore();
-    const [activeTab, setActiveTab] = useState('profile');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const initialTab = searchParams.get('tab') || 'profile';
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        const urlTab = searchParams.get('tab');
+        if (urlTab && urlTab !== activeTab) {
+            setActiveTab(urlTab);
+        }
+    }, [searchParams, activeTab]);
 
     const handleSave = () => {
         setIsSaving(true);
@@ -54,44 +63,10 @@ const Settings = () => {
                 </p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <aside className="lg:w-64 space-y-2">
-                        <TabsList className="flex lg:flex-col h-auto bg-transparent p-0 gap-1 w-full overflow-x-auto lg:overflow-visible no-scrollbar">
-                            <TabsTrigger
-                                value="profile"
-                                className="justify-start px-4 py-3 h-auto w-full data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm rounded-xl transition-all gap-3"
-                            >
-                                <User size={18} />
-                                <span className="hidden sm:inline">Profile</span>
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="notifications"
-                                className="justify-start px-4 py-3 h-auto w-full data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm rounded-xl transition-all gap-3"
-                            >
-                                <Bell size={18} />
-                                <span className="hidden sm:inline">Notifications</span>
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="security"
-                                className="justify-start px-4 py-3 h-auto w-full data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm rounded-xl transition-all gap-3"
-                            >
-                                <Shield size={18} />
-                                <span className="hidden sm:inline">Security</span>
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="appearance"
-                                className="justify-start px-4 py-3 h-auto w-full data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm rounded-xl transition-all gap-3"
-                            >
-                                <Palette size={18} />
-                                <span className="hidden sm:inline">Appearance</span>
-                            </TabsTrigger>
-                        </TabsList>
-                    </aside>
-
-                    <main className="flex-1 max-w-2xl">
-                        {/* Profile Section */}
-                        <TabsContent value="profile" className="m-0 space-y-6 animate-in fade-in duration-300">
+            <div className="flex flex-col lg:flex-row gap-8">
+                <main className="flex-1 max-w-2xl">
+                    {activeTab === 'profile' && (
+                        <div className="m-0 space-y-6 animate-in fade-in duration-300">
                             <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                                 <CardHeader>
                                     <CardTitle>Public Profile</CardTitle>
@@ -135,10 +110,11 @@ const Settings = () => {
                                     </Button>
                                 </CardFooter>
                             </Card>
-                        </TabsContent>
+                        </div>
+                    )}
 
-                        {/* Notifications Section */}
-                        <TabsContent value="notifications" className="m-0 space-y-6 animate-in fade-in duration-300">
+                    {activeTab === 'notifications' && (
+                        <div className="m-0 space-y-6 animate-in fade-in duration-300">
                             <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                                 <CardHeader>
                                     <CardTitle>Notifications</CardTitle>
@@ -186,10 +162,11 @@ const Settings = () => {
                                     </div>
                                 </CardContent>
                             </Card>
-                        </TabsContent>
+                        </div>
+                    )}
 
-                        {/* Security Section (Brief) */}
-                        <TabsContent value="security" className="m-0 space-y-6 animate-in fade-in duration-300">
+                    {activeTab === 'security' && (
+                        <div className="m-0 space-y-6 animate-in fade-in duration-300">
                             <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                                 <CardHeader>
                                     <CardTitle>Password & Security</CardTitle>
@@ -213,10 +190,11 @@ const Settings = () => {
                                     <Button className="w-full mt-4 bg-slate-900 dark:bg-white dark:text-slate-900 font-bold">Update Password</Button>
                                 </CardContent>
                             </Card>
-                        </TabsContent>
+                        </div>
+                    )}
 
-                        {/* Appearance Section */}
-                        <TabsContent value="appearance" className="m-0 space-y-6 animate-in fade-in duration-300">
+                    {activeTab === 'appearance' && (
+                        <div className="m-0 space-y-6 animate-in fade-in duration-300">
                             <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                                 <CardHeader>
                                     <CardTitle>Appearance</CardTitle>
@@ -239,10 +217,10 @@ const Settings = () => {
                                     </div>
                                 </CardContent>
                             </Card>
-                        </TabsContent>
-                    </main>
-                </div>
-            </Tabs>
+                        </div>
+                    )}
+                </main>
+            </div>
         </div>
     );
 };

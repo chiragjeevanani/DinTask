@@ -12,7 +12,9 @@ const NotFoundRedirect = () => {
         ? '/superadmin'
         : role === 'admin'
             ? '/admin'
-            : '/employee';
+            : role === 'manager'
+                ? '/manager'
+                : '/employee';
 
     return <Navigate to={defaultRoute} replace />;
 };
@@ -20,6 +22,7 @@ const NotFoundRedirect = () => {
 // Layouts
 import AdminLayout from '@/shared/layouts/AdminLayout';
 import EmployeeLayout from '@/shared/layouts/EmployeeLayout';
+import ManagerLayout from '@/shared/layouts/ManagerLayout';
 
 // Auth Pages
 import EmployeeLogin from '@/modules/user/pages/EmployeeLogin';
@@ -28,6 +31,7 @@ import SuperAdminLogin from '@/modules/superadmin/pages/SuperAdminLogin';
 
 // Admin Pages
 import AdminDashboard from '@/modules/admin/pages/Dashboard';
+import ManagerManagement from '@/modules/admin/pages/ManagerManagement';
 import EmployeeManagement from '@/modules/admin/pages/EmployeeManagement';
 import TaskManagement from '@/modules/admin/pages/TaskManagement';
 import TaskCompletion from '@/modules/admin/pages/TaskCompletion';
@@ -35,6 +39,18 @@ import Reports from '@/modules/admin/pages/Reports';
 import AdminCalendar from '@/modules/admin/pages/Calendar';
 import Subscription from '@/modules/admin/pages/Subscription';
 import Settings from '@/modules/admin/pages/Settings';
+
+import ManagerLogin from '@/modules/manager/pages/ManagerLogin';
+
+// Manager Pages
+import ManagerDashboard from '@/modules/manager/pages/Dashboard';
+import MyTasks from '@/modules/manager/pages/MyTasks';
+import TaskDelegation from '@/modules/manager/pages/TaskDelegation';
+import TeamManagement from '@/modules/manager/pages/TeamManagement';
+import TeamProgress from '@/modules/manager/pages/TeamProgress';
+import ManagerSchedule from '@/modules/manager/pages/Schedule';
+import ManagerReports from '@/modules/manager/pages/Reports';
+import ManagerSettings from '@/modules/manager/pages/Settings';
 
 // Employee Pages
 import EmployeeDashboard from '@/modules/user/pages/TaskHome';
@@ -61,6 +77,7 @@ const AppRouter = () => {
         <Routes>
             {/* Public Routes */}
             <Route path="/employee/login" element={<EmployeeLogin />} />
+            <Route path="/manager/login" element={<ManagerLogin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/superadmin/login" element={<SuperAdminLogin />} />
 
@@ -74,6 +91,7 @@ const AppRouter = () => {
                 }
             >
                 <Route index element={<AdminDashboard />} />
+                <Route path="managers" element={<ManagerManagement />} />
                 <Route path="employees" element={<EmployeeManagement />} />
                 <Route path="tasks" element={<TaskManagement />} />
                 <Route path="tasks/:id" element={<TaskCompletion />} />
@@ -121,6 +139,30 @@ const AppRouter = () => {
                 <Route path="settings" element={<SuperAdminSettings />} />
                 <Route path="reports" element={<div>System Reports (Coming Soon)</div>} />
                 <Route path="calendar" element={<div>System Calendar (Coming Soon)</div>} />
+            </Route>
+
+            {/* Manager Routes */}
+            <Route
+                path="/manager"
+                element={
+                    <ProtectedRoute allowedRoles={['manager']}>
+                        <ManagerLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<ManagerDashboard />} />
+                <Route path="my-tasks" element={<MyTasks />} />
+                <Route path="delegation" element={<TaskDelegation />} />
+                <Route path="team" element={<TeamManagement />} />
+                <Route path="progress" element={<TeamProgress />} />
+                <Route path="schedule" element={<ManagerSchedule />} />
+                <Route path="reports" element={<ManagerReports />} />
+                <Route path="settings" element={<ManagerSettings />} />
+                <Route path="settings/profile" element={<ManagerSettings />} />
+                <Route path="settings/notifications" element={<ManagerSettings />} />
+                <Route path="settings/security" element={<ManagerSettings />} />
+                <Route path="settings/customization" element={<ManagerSettings />} />
+                <Route path="settings/language" element={<ManagerSettings />} />
             </Route>
 
             {/* Default Redirection */}

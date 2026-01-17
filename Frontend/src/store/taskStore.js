@@ -43,7 +43,33 @@ const useTaskStore = create(
                 }));
             },
 
-            completeTask: (taskId, location) => {
+            assignTaskToManager: (taskId, managerId) => {
+                set((state) => ({
+                    tasks: state.tasks.map((task) =>
+                        task.id === taskId
+                            ? { ...task, assignedToManager: managerId, assignedBy: 'admin', status: 'pending' }
+                            : task
+                    ),
+                }));
+            },
+
+            delegateTaskToEmployee: (taskId, employeeId, managerId, notes) => {
+                set((state) => ({
+                    tasks: state.tasks.map((task) =>
+                        task.id === taskId
+                            ? {
+                                ...task,
+                                assignedTo: [...(task.assignedTo || []), employeeId],
+                                delegatedBy: managerId,
+                                delegationNotes: notes,
+                                status: 'pending'
+                            }
+                            : task
+                    ),
+                }));
+            },
+
+            completeTask: (taskId, location, completionData) => {
                 set((state) => ({
                     tasks: state.tasks.map((task) =>
                         task.id === taskId
@@ -52,6 +78,7 @@ const useTaskStore = create(
                                 status: 'completed',
                                 completedAt: new Date().toISOString(),
                                 completionLocation: location,
+                                ...completionData
                             }
                             : task
                     ),

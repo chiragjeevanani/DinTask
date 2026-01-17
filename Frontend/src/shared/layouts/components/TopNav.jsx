@@ -28,6 +28,7 @@ const TopNav = ({ onMenuClick, isSidebarCollapsed }) => {
         logout();
         if (role === 'superadmin') navigate('/superadmin/login');
         else if (role === 'admin') navigate('/admin/login');
+        else if (role === 'manager') navigate('/admin/login');
         else navigate('/employee/login');
     };
 
@@ -79,7 +80,7 @@ const TopNav = ({ onMenuClick, isSidebarCollapsed }) => {
                             <Button variant="ghost" className="p-0 hover:bg-transparent flex items-center gap-2">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-sm font-semibold text-slate-900 dark:text-white leading-none">{user?.name}</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-tighter">Admin</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-tighter">{role}</p>
                                 </div>
                                 <Avatar className="h-9 w-9 border-2 border-primary-100 dark:border-primary-900">
                                     <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name}`} />

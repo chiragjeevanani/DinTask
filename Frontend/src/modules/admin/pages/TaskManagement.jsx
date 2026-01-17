@@ -59,6 +59,7 @@ import {
 
 import useTaskStore from '@/store/taskStore';
 import useEmployeeStore from '@/store/employeeStore';
+import useManagerStore from '@/store/managerStore';
 import { cn } from '@/shared/utils/cn';
 import { fadeInUp, staggerContainer, scaleOnTap } from '@/shared/utils/animations';
 
@@ -69,6 +70,8 @@ const TaskManagement = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const { managers } = useManagerStore();
+    const [assignType, setAssignType] = useState('employee'); // 'employee' or 'manager'
 
     const [newTask, setNewTask] = useState({
         title: '',
@@ -76,6 +79,7 @@ const TaskManagement = () => {
         priority: 'medium',
         deadline: '',
         assignedTo: [],
+        assignedToManager: '',
         collaborationEnabled: false
     });
 
@@ -103,7 +107,14 @@ const TaskManagement = () => {
             return;
         }
 
-        addTask(newTask);
+        addTask({
+            ...newTask,
+            id: Date.now(),
+            status: 'pending',
+            progress: 0,
+            assignedBy: 'admin',
+            createdAt: new Date().toISOString()
+        });
         toast.success('Task created and assigned');
         setIsCreateModalOpen(false);
         setNewTask({
@@ -112,6 +123,7 @@ const TaskManagement = () => {
             priority: 'medium',
             deadline: '',
             assignedTo: [],
+            assignedToManager: '',
             collaborationEnabled: false
         });
     };
@@ -208,27 +220,81 @@ const TaskManagement = () => {
                                 </div>
                             </div>
 
-                            <div className="grid gap-3">
-                                <Label className="text-xs font-bold uppercase tracking-widest text-slate-400">Assign Employees</Label>
-                                <div className="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800">
-                                    {employees.map(emp => (
-                                        <div key={emp.id} className="flex items-center space-x-2 p-1">
-                                            <Checkbox
-                                                id={`emp-${emp.id}`}
-                                                checked={newTask.assignedTo.includes(emp.id)}
-                                                onCheckedChange={() => toggleEmployeeAssignment(emp.id)}
-                                                className="rounded-md border-slate-300"
-                                            />
-                                            <Label htmlFor={`emp-${emp.id}`} className="text-xs flex items-center gap-2 cursor-pointer font-bold">
-                                                <Avatar className="h-6 w-6 border border-white dark:border-slate-800 shadow-sm">
-                                                    <AvatarImage src={emp.avatar} />
-                                                    <AvatarFallback className="bg-primary-50 text-primary-600 text-[10px]">{emp.name.charAt(0)}</AvatarFallback>
-                                                </Avatar>
-                                                {emp.name}
-                                            </Label>
-                                        </div>
-                                    ))}
+                            <div className="grid gap-4">
+                                <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+                                    <Button
+                                        type="button"
+                                        variant={assignType === 'employee' ? 'default' : 'ghost'}
+                                        onClick={() => setAssignType('employee')}
+                                        className={cn("flex-1 rounded-xl h-9 text-[10px] font-black uppercase tracking-widest", assignType === 'employee' ? "bg-white dark:bg-slate-700 shadow-sm" : "text-slate-500 hover:text-slate-900")}
+                                    >
+                                        Direct Employees
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={assignType === 'manager' ? 'default' : 'ghost'}
+                                        onClick={() => setAssignType('manager')}
+                                        className={cn("flex-1 rounded-xl h-9 text-[10px] font-black uppercase tracking-widest", assignType === 'manager' ? "bg-white dark:bg-slate-700 shadow-sm" : "text-slate-500 hover:text-slate-900")}
+                                    >
+                                        Via Manager
+                                    </Button>
                                 </div>
+
+                                {assignType === 'employee' ? (
+                                    <div className="grid gap-3">
+                                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400">Assign Employees</Label>
+                                        <div className="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800">
+                                            {employees.map(emp => (
+                                                <div key={emp.id} className="flex items-center space-x-2 p-1">
+                                                    <Checkbox
+                                                        id={`emp-${emp.id}`}
+                                                        checked={newTask.assignedTo.includes(emp.id)}
+                                                        onCheckedChange={() => toggleEmployeeAssignment(emp.id)}
+                                                        className="rounded-md border-slate-300"
+                                                    />
+                                                    <Label htmlFor={`emp-${emp.id}`} className="text-xs flex items-center gap-2 cursor-pointer font-bold">
+                                                        <Avatar className="h-6 w-6 border border-white dark:border-slate-800 shadow-sm">
+                                                            <AvatarImage src={emp.avatar} />
+                                                            <AvatarFallback className="bg-primary-50 text-primary-600 text-[10px]">{emp.name.charAt(0)}</AvatarFallback>
+                                                        </Avatar>
+                                                        {emp.name}
+                                                    </Label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-3">
+                                        <Label className="text-xs font-bold uppercase tracking-widest text-slate-400">Assign to Manager</Label>
+                                        <Select
+                                            value={newTask.assignedToManager}
+                                            onValueChange={(val) => setNewTask({ ...newTask, assignedToManager: val, assignedTo: [] })}
+                                        >
+                                            <SelectTrigger className="h-11 rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800">
+                                                <SelectValue placeholder="Select a Manager" />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-xl">
+                                                {managers.map(mgr => (
+                                                    <SelectItem key={mgr.id} value={mgr.id} className="rounded-lg">
+                                                        <div className="flex items-center gap-2">
+                                                            <Avatar className="h-5 w-5 border border-white dark:border-slate-800 shadow-sm">
+                                                                <AvatarImage src={mgr.avatar} />
+                                                                <AvatarFallback className="text-[8px] font-black">{mgr.name.charAt(0)}</AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="text-left">
+                                                                <p className="text-xs font-bold leading-none">{mgr.name}</p>
+                                                                <p className="text-[9px] text-slate-500 mt-0.5">{mgr.department}</p>
+                                                            </div>
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <p className="text-[10px] text-slate-500 font-medium px-1 italic">
+                                            The manager will receive this task and delegate it to their team members.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex items-center space-x-3 bg-primary-50/50 dark:bg-primary-900/10 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-900/20">

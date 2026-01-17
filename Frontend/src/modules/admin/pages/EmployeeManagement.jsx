@@ -180,11 +180,11 @@ const EmployeeManagement = () => {
                         <thead>
                             <tr className="border-b border-slate-50 dark:border-slate-800">
                                 <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest w-10"></th>
-                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Employee</th>
-                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Role</th>
-                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Task Progress</th>
-                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[250px]">Employee</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[150px]">Role</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[200px]">Task Progress</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest min-w-[120px]">Status</th>
+                                <th className="p-5 text-xs font-bold text-slate-400 uppercase tracking-widest text-right min-w-[120px]">Actions</th>
                             </tr>
                         </thead>
                         <tbody ref={parent}>
@@ -242,7 +242,7 @@ const EmployeeManagement = () => {
                                                 </div>
                                             </td>
                                             <td className="p-5 text-right">
-                                                <div className="flex justify-end gap-1 opacity-10 lg:opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex justify-end gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg">
                                                         <Edit2 size={14} />
                                                     </Button>

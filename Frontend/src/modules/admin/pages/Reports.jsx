@@ -218,15 +218,15 @@ const Reports = () => {
                     <CardDescription>Line items based on selected filters</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto w-full">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
-                                    <TableHead className="pl-6 min-w-[200px]">Task Name</TableHead>
-                                    <TableHead className="min-w-[120px]">Assigned To</TableHead>
-                                    <TableHead className="min-w-[120px]">Created Date</TableHead>
-                                    <TableHead className="min-w-[100px]">Status</TableHead>
-                                    <TableHead className="text-right pr-6 min-w-[80px]">Efficiency</TableHead>
+                                    <TableHead className="pl-4 md:pl-6 min-w-[250px]">Task Name</TableHead>
+                                    <TableHead className="min-w-[150px]">Assigned To</TableHead>
+                                    <TableHead className="min-w-[140px]">Created Date</TableHead>
+                                    <TableHead className="min-w-[120px]">Status</TableHead>
+                                    <TableHead className="text-right pr-4 md:pr-6 min-w-[100px]">Efficiency</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -239,7 +239,7 @@ const Reports = () => {
                                 ) : (
                                     filteredData.map((data) => (
                                         <TableRow key={data.id} className="border-slate-50 dark:border-slate-800">
-                                            <TableCell className="pl-6 font-medium text-slate-900 dark:text-white">
+                                            <TableCell className="pl-4 md:pl-6 font-medium text-slate-900 dark:text-white">
                                                 {data.title}
                                             </TableCell>
                                             <TableCell>
@@ -266,7 +266,7 @@ const Reports = () => {
                                                     {data.status}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-right pr-6">
+                                            <TableCell className="text-right pr-4 md:pr-6">
                                                 <span className={cn(
                                                     "text-xs font-bold",
                                                     data.priority === 'urgent' ? "text-red-500" : "text-slate-900 dark:text-slate-300"

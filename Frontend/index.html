@@ -8,16 +8,11 @@
   <title>dintask</title>
   <style>
     /* GLOBAL SCROLL OVERRIDE */
+    /* GLOBAL SCROLL OVERRIDE - REMOVED TO FIX APP LAYOUT SCROLLING */
     html,
-    body,
-    #root {
-      height: auto !important;
-      min-height: 100vh !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      position: static !important;
-      margin: 0 !important;
-      padding: 0 !important;
+    body {
+      overscroll-behavior-y: none;
+      /* Prevent pull-to-refresh on mobile if desirable for app-feel */
     }
   </style>
 </head>

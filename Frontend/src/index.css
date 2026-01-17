@@ -386,21 +386,7 @@ body {
   }
 }
 
-/* NUCLEAR SCROLL FIX - Force document to be scrollable */
-html,
-body,
-#root {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: auto !important;
-  min-height: 100vh !important;
-  position: static !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Ensure main content can grow */
+/* Main content growth */
 main {
-  flex: 1 0 auto !important;
-  overflow: visible !important;
+  flex: 1;
 }

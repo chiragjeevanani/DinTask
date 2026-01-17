@@ -31,9 +31,9 @@ const EmployeeLayout = () => {
     return (
         <div className="fixed inset-0 h-[100dvh] w-full flex flex-col bg-background-light dark:bg-background-dark font-display transition-colors duration-300 overflow-hidden">
             {/* Page Content */}
-            <main className="flex-1 overflow-y-auto no-scrollbar relative w-full">
+            <main className="flex-1 overflow-y-auto no-scrollbar relative w-full h-full overscroll-y-contain">
                 <div className={cn(
-                    "max-w-[480px] mx-auto w-full h-full",
+                    "max-w-[480px] mx-auto w-full min-h-full",
                     showFooter ? "pb-28" : "pb-6"
                 )}>
                     <Outlet />

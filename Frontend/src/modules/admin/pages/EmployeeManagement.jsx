@@ -357,7 +357,7 @@ const EmployeeManagement = () => {
                                 id="name"
                                 value={newEmployee.name}
                                 onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                                placeholder="John Doe"
+                                placeholder="Chirag J"
                                 className="rounded-xl h-11"
                                 required
                             />
@@ -369,7 +369,7 @@ const EmployeeManagement = () => {
                                 type="email"
                                 value={newEmployee.email}
                                 onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                                placeholder="john@example.com"
+                                placeholder="chirag.j@example.com"
                                 className="rounded-xl h-11"
                                 required
                             />

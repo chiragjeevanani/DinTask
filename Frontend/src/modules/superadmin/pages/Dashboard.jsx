@@ -49,7 +49,10 @@ import useSuperAdminStore from '@/store/superAdminStore';
 import { cn } from '@/shared/utils/cn';
 import { fadeInUp, staggerContainer, scaleOnTap } from '@/shared/utils/animations';
 
+import { useNavigate } from 'react-router-dom';
+
 const SuperAdminDashboard = () => {
+    const navigate = useNavigate();
     const { admins, plans, stats } = useSuperAdminStore();
 
     const chartData = [
@@ -267,7 +270,7 @@ const SuperAdminDashboard = () => {
                             <CardTitle className="text-lg font-bold">Recent Company Registrations</CardTitle>
                             <CardDescription>Newly boarded administrative accounts</CardDescription>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-xs font-black uppercase tracking-widest gap-1 text-primary-600 hover:bg-primary-50 rounded-xl w-full sm:w-auto justify-center">
+                        <Button variant="ghost" size="sm" onClick={() => navigate('/superadmin/admins')} className="text-xs font-black uppercase tracking-widest gap-1 text-primary-600 hover:bg-primary-50 rounded-xl w-full sm:w-auto justify-center">
                             View All <ChevronRight size={14} />
                         </Button>
                     </CardHeader>
@@ -285,7 +288,11 @@ const SuperAdminDashboard = () => {
                                 </TableHeader>
                                 <TableBody>
                                     {admins.slice(0, 3).map((adm) => (
-                                        <TableRow key={adm.id} className="border-slate-50 dark:border-slate-800 group cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-shadow duration-300">
+                                        <TableRow
+                                            key={adm.id}
+                                            className="border-slate-50 dark:border-slate-800 group cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-shadow duration-300"
+                                            onClick={() => navigate('/superadmin/admins')}
+                                        >
                                             <TableCell className="pl-4 md:pl-8 font-black text-slate-900 dark:text-white text-sm">
                                                 {adm.name}
                                             </TableCell>

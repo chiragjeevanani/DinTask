@@ -80,6 +80,76 @@ export const createSubscription = async (req, res) => {
   }
 };
 
+export const upgradeSubscription = async (req, res) => {
+  try {
+    const { planId } = req.body;
+    const { id: adminId } = req.user;
+
+    // 🔹 Check new plan
+    const newPlan = await Plan.findById(planId);
+    if (!newPlan || !newPlan.isActive || newPlan.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Plan not found or inactive",
+      });
+    }
+
+    // 🔹 Get user's active subscription
+    const activeSubscription = await Subscription.findOne({
+      adminId,
+      status: "active",
+      isDeleted: false,
+    });
+
+    if (!activeSubscription) {
+      return res.status(404).json({
+        success: false,
+        message: "Active subscription not found",
+      });
+    }
+
+    // 🔹 Same plan check
+    if (activeSubscription.planId.toString() === planId) {
+      return res.status(400).json({
+        success: false,
+        message: "Already on this plan",
+      });
+    }
+
+    // 🔹 Create Razorpay subscription for new plan
+    const razorpaySubscription = await razorpay.subscriptions.create({
+      plan_id: newPlan.razorpayPlanId,
+      customer_notify: 1,
+      total_count: 12,
+    });
+
+    // 🔹 Create NEW subscription as pending
+    const newSubscription = await Subscription.create({
+      adminId,
+      planId,
+      razorpaySubscriptionId: razorpaySubscription.id,
+      razorpaySubscriptionUrl: razorpaySubscription.short_url,
+      status: "pending",
+      finalPayableAmount: newPlan.planPrice,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Upgrade initiated. Please complete payment.",
+      subscription: newSubscription,
+      paymentUrl: razorpaySubscription.short_url,
+    });
+
+  } catch (error) {
+    console.log("Upgrade Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 /* ============ GET SUBSCRIPTION OF ADMIN ============ */
 export const getSubscriptionByAdmin = async (req, res) => {
   try {

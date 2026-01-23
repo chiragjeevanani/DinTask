@@ -3,13 +3,15 @@ import {
   createSubscription,
   getSubscriptionByAdmin,
   getAllSubscriptions,
-  cancelSubscription
+  cancelSubscription,
+  upgradeSubscription
 } from "../Controllers/SubscriptionCtrl.js";
 
 const router = express.Router();
 import { AdminMiddleware, isAdmin } from "../Middlewares/AdminMiddleware.js";
 // Create a subscription
 router.post("/createSubscription", AdminMiddleware, isAdmin, createSubscription);
+router.post("/upgradeSubscription", AdminMiddleware, isAdmin, upgradeSubscription);
 
 // Get subscription by admin
 router.get("/getSubscriptionByAdmin",AdminMiddleware, isAdmin, getSubscriptionByAdmin);

@@ -13,17 +13,16 @@ const HelpLegal = () => {
         {
             title: 'Support',
             items: [
-                { icon: <HelpCircle className="text-blue-500" />, label: 'Help Center', sub: 'Guides and tutorials' },
-                { icon: <MessageCircle className="text-emerald-500" />, label: 'Chat with Support', sub: 'Available 24/7' },
-                { icon: <BookOpen className="text-purple-500" />, label: 'API Documentation', sub: 'For developers' },
+                { icon: <HelpCircle className="text-blue-500" />, label: 'Help Center', sub: 'Guides and tutorials', path: '/employee/profile/help/center' },
+                { icon: <BookOpen className="text-purple-500" />, label: 'API Documentation', sub: 'For developers', path: '/employee/profile/help/api' },
             ]
         },
         {
             title: 'Legal',
             items: [
-                { icon: <Shield className="text-amber-500" />, label: 'Privacy Policy', sub: 'How we handle your data' },
-                { icon: <FileText className="text-slate-500" />, label: 'Terms of Service', sub: 'Rules for using DinTask' },
-                { icon: <Info className="text-indigo-500" />, label: 'System status', sub: 'Current uptime & stability' },
+                { icon: <Shield className="text-amber-500" />, label: 'Privacy Policy', sub: 'How we handle your data', path: '/employee/profile/help/privacy' },
+                { icon: <FileText className="text-slate-500" />, label: 'Terms of Service', sub: 'Rules for using DinTask', path: '/employee/profile/help/terms' },
+                { icon: <Info className="text-indigo-500" />, label: 'System status', sub: 'Current uptime & stability', path: '/employee/profile/help/status' },
             ]
         }
     ];
@@ -59,7 +58,11 @@ const HelpLegal = () => {
                         <Card className="border-none shadow-sm bg-white dark:bg-slate-900 rounded-3xl overflow-hidden">
                             <CardContent className="p-0 divide-y divide-slate-50 dark:divide-slate-800">
                                 {section.items.map((item, i) => (
-                                    <div key={i} className="flex items-center justify-between p-4 active:bg-slate-50 dark:active:bg-slate-800 transition-colors cursor-pointer group">
+                                    <div
+                                        key={i}
+                                        onClick={() => navigate(item.path)}
+                                        className="flex items-center justify-between p-4 active:bg-slate-50 dark:active:bg-slate-800 transition-colors cursor-pointer group"
+                                    >
                                         <div className="flex items-center gap-4">
                                             <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 group-hover:scale-110 transition-transform">
                                                 {item.icon}

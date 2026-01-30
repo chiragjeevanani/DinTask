@@ -88,6 +88,12 @@ import Preferences from '@/modules/user/pages/Preferences';
 import HelpLegal from '@/modules/user/pages/HelpLegal';
 import AddTask from '@/modules/user/pages/AddTask';
 import NotificationsList from '@/modules/user/pages/NotificationsList';
+import HelpCenter from '@/modules/user/pages/HelpCenter';
+import ChatSupport from '@/modules/user/pages/ChatSupport';
+import ApiDocs from '@/modules/user/pages/ApiDocs';
+import PrivacyPolicy from '@/modules/user/pages/PrivacyPolicy';
+import TermsOfService from '@/modules/user/pages/TermsOfService';
+import SystemStatus from '@/modules/user/pages/SystemStatus';
 
 // Super Admin Pages
 import SuperAdminDashboard from '@/modules/superadmin/pages/Dashboard';
@@ -160,6 +166,12 @@ const AppRouter = () => {
                 <Route path="profile/security" element={<Security />} />
                 <Route path="profile/preferences" element={<Preferences />} />
                 <Route path="profile/help" element={<HelpLegal />} />
+                <Route path="profile/help/privacy" element={<PrivacyPolicy />} />
+                <Route path="profile/help/terms" element={<TermsOfService />} />
+                <Route path="profile/help/status" element={<SystemStatus />} />
+                <Route path="profile/help/center" element={<HelpCenter />} />
+                <Route path="profile/help/chat" element={<ChatSupport />} />
+                <Route path="profile/help/api" element={<ApiDocs />} />
             </Route>
 
             {/* Super Admin Routes */}
